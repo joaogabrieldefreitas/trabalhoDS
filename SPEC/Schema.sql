@@ -1,9 +1,9 @@
--- =========================================================
+
 -- ESQUEMA COMPLETO DE BANCO DE DADOS - SISTEMA DE PONTO
 -- SUPABASE POSTGRESQL
--- =========================================================
 
--- 1. LIMPEZA PREVENTIVA (Evita erros ao reexecutar o script)
+
+
 DROP TYPE IF EXISTS tipo_registro_enum CASCADE;
 DROP TYPE IF EXISTS tipo_ocorrencia_enum CASCADE;
 

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Controle de Ponto</title>
+  
+  <!-- CSS Principal -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Lucide Icons via CDN ESM / UMD -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- Layout Principal de Tela (Tablet/Desktop) -->
+  <div class="app-container">
+    
+    <!-- Cabeçalho -->
+    <header class="app-header" id="app-header">
+      <div class="header-brand">
+        <i data-lucide="clock" class="brand-icon"></i>
+        <div class="brand-text">
+          <h1>Controle de Ponto</h1>
+          <p>Terminal Autônomo de Registro</p>
+        </div>
+      </div>
+      <div class="header-clock" id="header-clock">
+        <span class="clock-time" id="clock-time">00:00:00</span>
+        <span class="clock-date" id="clock-date">--/--/----</span>
+      </div>
+    </header>
+
+    <!-- Conteúdo Principal em 2 Colunas (Modo Paisagem) -->
+    <main class="app-content">
+      
+      <!-- Coluna da Câmera / Scanner -->
+      <section class="scanner-section">
+        <div class="card scanner-card">
+          <div class="card-header">
+            <i data-lucide="qr-code" class="card-icon"></i>
+            <h2>Leitor de QR Code</h2>
+          </div>
+          
+          <div class="viewport-wrapper">
+            <video id="webcam-video" autoplay playsinline muted></video>
+            <canvas id="qr-canvas" class="hidden-canvas"></canvas>
+            
+            <div class="scanner-overlay">
+              <div class="scanner-frame">
+                <div class="corner top-left"></div>
+                <div class="corner top-right"></div>
+                <div class="corner bottom-left"></div>
+                <div class="corner bottom-right"></div>
+                <div class="scan-line"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="scanner-instructions">
+            <i data-lucide="camera" class="inline-icon"></i>
+            <span>Aproxime o seu QR Code da câmera para registrar o ponto</span>
+          </div>
+
+          <!-- Opção de teste manual de QR Hash para testes/simulações -->
+          <div class="manual-input-box">
+            <label for="manual-qr-input">
+              <i data-lucide="keyboard" class="inline-icon"></i> Entrada Manual / Teste:
+            </label>
+            <div class="input-group">
+              <input type="text" id="manual-qr-input" placeholder="Cole o Hash do QR Code ou Matrícula...">
+              <button type="button" id="btn-manual-submit" class="btn btn-secondary">
+                <i data-lucide="arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Coluna de Painel de Status / Resultado -->
+      <section class="status-section">
+        
+        <!-- Estado Inicial / Neutro -->
+        <div id="status-idle" class="card status-card">
+          <div class="status-illustration">
+            <i data-lucide="scan-line" class="illustration-icon"></i>
+          </div>
+          <h3>Aguardando Leitura</h3>
+          <p>Posicione seu crachá com QR Code de forma visível no leitor ao lado.</p>
+          <div class="time-window-info" id="time-window-info">
+            <i data-lucide="info" class="inline-icon"></i>
+            <span>Carregando janelas de horário...</span>
+          </div>
+        </div>
+
+        <!-- Estado Processando -->
+        <div id="status-processing" class="card status-card hidden">
+          <div class="spinner"></div>
+          <h3>Processando Registro</h3>
+          <p>Aguarde enquanto validamos as informações no Supabase...</p>
+        </div>
+
+        <!-- Alerta de Erro / Fora de Janela / QR Inválido -->
+        <div id="status-alert" class="card status-card status-alert-card hidden">
+          <div class="alert-header">
+            <i data-lucide="shield-alert" class="alert-icon"></i>
+            <h3 id="alert-title">Tentativa Fora da Janela</h3>
+          </div>
+          <p id="alert-message">A sua tentativa de batida de ponto foi realizada fora do horário permitido.</p>
+
+          <div id="alert-photo-container" class="alert-photo-wrapper hidden">
+            <p class="photo-caption">
+              <i data-lucide="camera-off" class="inline-icon"></i> Foto da Ocorrência Registrada:
+            </p>
+            <img id="alert-photo-img" src="" alt="Foto da Ocorrência">
+          </div>
+
+          <div class="alert-badge" id="alert-badge-type">TENTATIVA_FORA_JANELA_ENTRADA</div>
+
+          <button id="btn-reset-alert" class="btn btn-primary btn-block">
+            <i data-lucide="refresh-cw"></i> Voltar à Tela Inicial
+          </button>
+        </div>
+
+        <!-- Ticket de Ponto (Sucesso) -->
+        <div id="status-ticket" class="card status-card status-ticket-card hidden">
+          <div class="ticket-header">
+            <i data-lucide="check-circle-2" class="success-icon"></i>
+            <h3>Ponto Registrado com Sucesso!</h3>
+          </div>
+
+          <div id="printable-ticket" class="printable-ticket">
+            <div class="ticket-brand">
+              <i data-lucide="building-2"></i> COMPROVANTE DE REGISTRO DE PONTO
+            </div>
+            <div class="ticket-divider"></div>
+            <div class="ticket-row">
+              <span class="label">Colaborador:</span>
+              <span class="value" id="ticket-nome">--</span>
+            </div>
+            <div class="ticket-row">
+              <span class="label">Matrícula:</span>
+              <span class="value" id="ticket-matricula">--</span>
+            </div>
+            <div class="ticket-row">
+              <span class="label">Data / Hora:</span>
+              <span class="value" id="ticket-datetime">--</span>
+            </div>
+            <div class="ticket-row">
+              <span class="label">Tipo de Registro:</span>
+              <span class="value highlight" id="ticket-tipo">--</span>
+            </div>
+            <div class="ticket-divider"></div>
+            <div class="ticket-footer">
+              <p>Registro Gravado de Forma Imutável</p>
+              <p class="ticket-id" id="ticket-id">ID: --</p>
+            </div>
+          </div>
+
+          <div class="ticket-actions">
+            <button id="btn-print-ticket" class="btn btn-primary">
+              <i data-lucide="printer"></i> Imprimir Comprovante
+            </button>
+            <button id="btn-finish-ticket" class="btn btn-secondary">
+              <i data-lucide="check"></i> Concluir
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- Script Principal App -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+127.0.0.1 - - [24/Sep/2026 19:58:06] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [24/Sep/2026 19:58:06] "GET /js/app.js HTTP/1.1" 200 -
+127.0.0.1 - - [24/Sep/2026 19:58:06] "GET /css/styles.css HTTP/1.1" 200 -
+127.0.0.1 - - [24/Sep/2026 19:58:07] "GET /components/header.js HTTP/1.1" 200 -
+127.0.0.1 - - [24/Sep/2026 19:58:07] "GET /components/ticket.js HTTP/1.1" 200 -
+127.0.0.1 - - [24/Sep/2026 19:58:07] "GET /components/alert.js HTTP/1.1" 200 -
+127.0.0.1 - - [24/Sep/2026 19:58:07] "GET /services/cameraService.js HTTP/1.1" 200 -
+127.0.0.1 - - [24/Sep/2026 19:58:07] "GET /services/qrScannerService.js HTTP/1.1" 200 -
+127.0.0.1 - - [24/Sep/2026 19:58:07] "GET /services/windowService.js HTTP/1.1" 200 -
+127.0.0.1 - - [24/Sep/2026 19:58:07] "GET /services/supabaseService.js HTTP/1.1" 200 -
+127.0.0.1 - - [24/Sep/2026 19:58:07] "GET /js/config.js HTTP/1.1" 200 -
